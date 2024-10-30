@@ -385,7 +385,8 @@ class Tapper:
                 82: "Dotsama",
                 85: "Dominance",
                 86: "Drawdown",
-                90: "Drivechain"
+                90: "Drivechain",
+                92: "Delisting"
                 # Добавьте другие известные ответы здесь
             }
 
