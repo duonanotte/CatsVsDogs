@@ -372,6 +372,7 @@ class Tapper:
                 118: "CUSTODY",
                 119: "BAG",
                 122: "BAKERS",
+                123: "ALTCOIN",
             }
 
             total_tasks = len(youtube_tasks)
