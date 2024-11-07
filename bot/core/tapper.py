@@ -230,18 +230,16 @@ class Tapper:
 
     async def processing_tasks(self, http_client: aiohttp.ClientSession):
         try:
-            # Список ID заданий, которые мы хотим выполнять
-            allowed_task_ids = [2, 3, 5, 22, 38, 39, 41, 61, 70]  # Добавьте нужные ID
+            allowed_task_ids = [2, 3, 5, 22, 38, 39, 41, 61, 70, 96, 110, 121]
 
             tasks_req = await http_client.get("https://api.catsdogs.live/tasks/list")
             tasks_req.raise_for_status()
             tasks_json = await tasks_req.json()
 
-            # Фильтруем задания по ID
             filtered_tasks = [
                 task for task in tasks_json
                 if task.get('id') in allowed_task_ids
-                   and not task.get('transaction_id')  # Проверяем что задание еще не выполнено
+                   and not task.get('transaction_id')
             ]
 
             if not filtered_tasks:
@@ -255,33 +253,18 @@ class Tapper:
                 task_id = task.get('id')
                 title = task.get('title', 'Unknown')
 
-                # Проверка на тип задания
-                if task.get('channel_id', '') != '':
-                    if not settings.JOIN_TG_CHANNELS:
-                        logger.info(f"{self.session_name} | Skipping Telegram channel task (disabled in settings)")
-                        continue
-
-                    # url = task.get('link', '')
-                    # logger.info(f"{self.session_name} | Task {completed_tasks + 1}/{total_tasks}: "
-                    #             f"Performing TG subscription to <ly>{url}</ly>")
-                    result = await self.verify_task(http_client, task_id)
-                else:
-                    # logger.info(f"{self.session_name} | Task {completed_tasks + 1}/{total_tasks}: "
-                    #             f"Performing <ly>{title}</ly> task")
-                    result = await self.verify_task(http_client, task_id)
+                result = await self.verify_task(http_client, task_id)
 
                 if result:
                     completed_tasks += 1
                     reward = task.get('amount', 0)
-                    logger.success(f"{self.session_name} | Task <ly>{title}</ly> completed! |"
-                                   f" Reward: <ly>+{reward}</ly> FOOD")
+                    logger.success(
+                        f"{self.session_name} | Task <ly>{title}</ly> completed! | Reward: <ly>+{reward}</ly> FOOD")
                 else:
                     logger.warning(f"{self.session_name} | Task <lr>{title}</lr> not completed")
 
-                # Делаем задержку между заданиями, если это не последнее задание
                 if completed_tasks < total_tasks:
                     delay = random.randint(5, 10)
-                    # logger.info(f"{self.session_name} | Waiting {delay} seconds before next task")
                     await asyncio.sleep(delay)
 
             logger.info(f"{self.session_name} | Completed {completed_tasks}/{total_tasks} tasks from allowed list")
@@ -386,8 +369,9 @@ class Tapper:
                 85: "Dominance",
                 86: "Drawdown",
                 90: "Drivechain",
-                92: "Delisting"
-                # Добавьте другие известные ответы здесь
+                118: "CUSTODY",
+                119: "BAG",
+                122: "BAKERS",
             }
 
             total_tasks = len(youtube_tasks)
